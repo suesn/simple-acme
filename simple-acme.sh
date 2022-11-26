@@ -19,6 +19,22 @@ yellow(){
 
 [[ $EUID -ne 0 ]] && red "注意：请在root用户下运行脚本" && exit 1
 
+for i in "${CMD[@]}"; do
+    SYS="$i"
+    if [[ -n $SYS ]]; then
+        break
+    fi
+done
+
+for ((int = 0; int < ${#REGEX[@]}; int++)); do
+    if [[ $(echo "$SYS" | tr '[:upper:]' '[:lower:]') =~ ${REGEX[int]} ]]; then
+        SYSTEM="${RELEASE[int]}"
+        if [[ -n $SYSTEM ]]; then
+            break
+        fi
+    fi
+done
+
 install_base(){
     apt update
     apt install curl socat -y
