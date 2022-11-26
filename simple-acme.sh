@@ -61,7 +61,7 @@ install_acme(){
         yellow "1. 检查VPS的网络环境"
         yellow "2. 脚本可能跟不上时代, 建议截图发布到GitHub Issues询问"
     fi
-    green "已安装acme.sh脚本，并设置短链接 acme.sh ，开启自动更新、自动续签证书，并且默认证书机构已设置为 etsencrypt !"
+    green "已安装acme.sh脚本，并设置短链接 acme.sh ，开启自动更新、自动续签证书，并且默认证书机构已设置为 let's encrypt !"
 }
 
 uninstall() {
@@ -74,10 +74,11 @@ uninstall() {
 start() {
     read -rp "请输入域名: " domain
     [[ -z $domain ]] && red "未输入域名，无法执行操作！" && exit 1
-    ip4=$(curl 4.ip.sb)
-    ip6=$(curl 6.ip.sb)
+    ip4=$(curl -4 ip.sb)
+    ip6=$(curl -6 ip.sb)
     server4=$(curl ipget.net/?ip="${domain}" -4)
     server6=$(curl ipget.net/?ip="${domain}" -6)
+    ips = 0.0.0.0
 
     green "当前vps的ipv4为 $ip4"
     green "当前vps的ipv6为 $ip6"
@@ -96,7 +97,7 @@ start() {
 
     read -rp "请选择申请模式(standalone:无服务器 nginx:使用nginx apache:使用apache)" type
 
-    acme.sh --issue -d ${domain} --standalone ${ips} --${type}
+    bash ~/.acme.sh/acme.sh --issue -d ${domain} --standalone ${ips} --${type}
 }
 
 switch_provider(){
@@ -118,8 +119,8 @@ switch_provider(){
 menu() {
     clear
     echo "############################################################"
-    echo "#                   ${RED}simple acme${PLAIN}              #"
-    echo "#${GREEN}助您方便申请证书${PLAIN}                             #"
+    echo "#                   simple acme              #"
+    echo "#助您方便申请证书                             #"
     echo "#############################################################"
     echo ""
     echo -e " ${GREEN}1.${PLAIN} 安装 Acme.sh 域名证书申请脚本"
