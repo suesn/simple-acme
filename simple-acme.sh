@@ -90,14 +90,14 @@ start() {
 
     read -rp "请输入是否使用ipv6申请？(Y/n)" iptype
     if [[ $iptype != n ]]; then
-        ips = --listen-v6 
+        ips ="--listen-v6"
     else
-        ips = --listen-v4
+        ips ="--listen-v4"
     fi
 
     read -rp "请选择申请模式(standalone:无服务器 nginx:使用nginx apache:使用apache)" type
 
-    bash ~/.acme.sh/acme.sh --issue -d ${domain} --standalone ${ips} --${type}
+    bash ~/.acme.sh/acme.sh --issue -d ${domain} ${ips} --${type}
 }
 
 switch_provider(){
