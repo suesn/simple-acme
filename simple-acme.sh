@@ -100,7 +100,7 @@ start() {
     fi
 
     read -rp "请选择申请模式(standalone(默认):无服务器 nginx:使用nginx apache:使用apache )" type
-    if [[ "$type" != "nginx"] && "$type" != "apache" && "$type" != "standalone"]; then
+    if [[ "$type" != "nginx" && "$type" != "apache" && "$type" != "standalone" ]]; then
         type="standalone"
     fi
 
