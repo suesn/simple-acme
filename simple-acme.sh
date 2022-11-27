@@ -78,6 +78,7 @@ start() {
     ip6=$(curl -6 ip.sb)
     server4=$(curl ipget.net/?ip="${domain}" -4)
     server6=$(curl ipget.net/?ip="${domain}" -6)
+    baling=$(lsof -i:80)
 
     green "当前vps的ipv4为 $ip4"
     green "当前vps的ipv6为 $ip6"
@@ -85,7 +86,11 @@ start() {
     yellow "输入域名的ipv4为 $server4"
     yellow "输入域名的ipv6为 $server6"
 
-    red "请检查域名是否解析到ip!"
+    red "80端口占用（没有内容代表没占用）： $baling"
+
+    red "请检查域名是否解析到ip,并检查80端口是否占用！"
+    red "如果有请按ctrl + c退出脚本，并使用 kill [pid] 结束进程"
+    red "某些VPS自带apache2，如果你不需要，可以用 apt remove apache2 -y 删除！"
 
     read -rp "请输入是否使用ipv6申请？(Y/n)" iptype
     if [[ $iptype != n ]]; then
@@ -94,7 +99,12 @@ start() {
         ips="--listen-v4"
     fi
 
-    read -rp "请选择申请模式(standalone:无服务器 nginx:使用nginx apache:使用apache )" type
+    read -rp "请选择申请模式(standalone(默认):无服务器 nginx:使用nginx apache:使用apache )" type
+    if [[ "$type" != "nginx"] && "$type" != "apache" && "$type" != "standalone"]; then
+        type="standalone"
+    fi
+
+    yellow "即将为 ${domain} 使用 ${type} 申请证书！"
 
     bash ~/.acme.sh/acme.sh --issue -d ${domain} ${ips} --${type}
 }
