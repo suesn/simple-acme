@@ -88,9 +88,12 @@ start() {
 
     red "80端口占用（没有内容代表没占用）： $baling"
 
+    echo ""
     red "请检查域名是否解析到ip,并检查80端口是否占用！"
     red "如果有请按ctrl + c退出脚本，并使用 kill [pid] 结束进程"
     red "某些VPS自带apache2，如果你不需要，可以用 apt remove apache2 -y 删除！"
+    yellow "请尽量关闭CDN申请!"
+
 
     read -rp "请输入是否使用ipv6申请？(Y/n)" iptype
     if [[ $iptype != n ]]; then
@@ -107,6 +110,13 @@ start() {
     yellow "即将为 ${domain} 使用 ${type} 申请证书！"
 
     bash ~/.acme.sh/acme.sh --issue -d ${domain} ${ips} --${type}
+
+    mkdir ~/${domain}
+    cp ~/.acme.sh/$domain/chain.cer ~/${domain}.crt
+    cp ~/.acme.sh/$domain/${domain}.key ~/${domain}.key
+    green "如果申请成功，将保存到以下路径"
+    green "证书链(fullchain): ~/${domain}.crt"
+    green "私钥: ~/${domain}.key"
 }
 
 switch_provider(){
@@ -128,8 +138,8 @@ switch_provider(){
 menu() {
     clear
     echo "############################################################"
-    echo "#                   simple acme              #"
-    echo "#助您方便申请证书                             #"
+    echo "#                   simple acme                            #"
+    echo "#助您方便申请证书                                             #"
     echo "#############################################################"
     echo ""
     echo -e " ${GREEN}1.${PLAIN} 安装 Acme.sh 域名证书申请脚本"
