@@ -40,6 +40,6 @@ bash simple-acme.sh
 
 主要代码来源: [taffychan-acme](https://github.com/taffychan/acme)
 
-[acme.sh]([htts://acme.sh/](https://github.com/acmesh-official/acme.sh))
+[acme.sh](https://acme.sh/)
 
 [Let's Encrypt](https://letsencrypt.org/)
