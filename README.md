@@ -36,6 +36,10 @@ bash simple-acme.sh
 - [ ] 人性化的输入判断（技术有限，不会添加）
 - [ ] 后续更新（本来就是奔着简单来的，还要什么?）
 
-# 感谢🙏
+# Credits
 
-小小项目2颗star了，感谢支持！
+主要代码来源: [taffychan-acme](https://github.com/taffychan/acme)
+
+[acme.sh](htts://acme.sh)
+
+[Let's Encrypt](https://letsencrypt.org/)
