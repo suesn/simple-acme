@@ -112,11 +112,11 @@ start() {
     bash ~/.acme.sh/acme.sh --issue -d ${domain} ${ips} --${type}
 
     mkdir ~/${domain}
-    cp ~/.acme.sh/$domain/chain.cer ~/${domain}.crt
-    cp ~/.acme.sh/$domain/${domain}.key ~/${domain}.key
+    cp ~/.acme.sh/$domain/fullchain.cer ~/${domain}/${domain}.crt
+    cp ~/.acme.sh/$domain/${domain}.key  ~/${domain}/${domain}.key
     green "如果申请成功，将保存到以下路径"
-    green "证书链(fullchain): ~/${domain}.crt"
-    green "私钥: ~/${domain}.key"
+    green "证书(链)(fullchain): ~/${domain}/${domain}.crt"
+    green "私钥: ~/${domain}/${domain}.key"
 }
 
 switch_provider(){
@@ -139,8 +139,8 @@ menu() {
     clear
     echo "############################################################"
     echo "#                   simple acme                            #"
-    echo "#助您方便申请证书                                             #"
-    echo "#############################################################"
+    echo "#助您方便申请证书                                            #"
+    echo "###########################################################"
     echo ""
     echo -e " ${GREEN}1.${PLAIN} 安装 Acme.sh 域名证书申请脚本"
     echo -e " ${GREEN}2.${PLAIN} ${RED}卸载 Acme.sh 域名证书申请脚本${PLAIN}"
