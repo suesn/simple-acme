@@ -135,21 +135,44 @@ switch_provider(){
         3) bash ~/.acme.sh/acme.sh --set-default-ca --server zerossl && green "切换证书提供商为 ZeroSSL.com 成功！" ;;
         *) bash ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt && green "切换证书提供商为 Letsencrypt.org 成功！" ;;
     esac
-    back2menu
 }
 
+own_cert() {
+    read -p "请输入您的域名(支持*): " domain
+    echo ""
+    read -p "请输入有效天数: " days
+    echo ""
+    read -p "请输入国家代码(可以乱编，示例:CN): " country
+    echo ""
+    read -p "请输入行政省名称(可以编，示例: Shanghai): " state
+    echo ""
+    read -p "请输入城市名(可以编，示例: Shanghai): " city
+    echo ""
+    read -p "请输入组织名(编，示例: Tencent): " company
+    echo ""
+    read -p "请输入组织单位名(编，示例: Shoping): " section
+    echo ""
+
+    mkdir ~/${domain}
+    cd ~/${domain}
+    openssl genrsa -out ${domain}.key 1024
+    openssl req -new -x509 -days ${days} -key ${domain}.key -out ${domain}.crt -subj "/C=${country}/ST=${state}/L=${city}/O=${company}/OU=${section}/CN=${domain}"
+    yellow "生成成功，证书位于 /root/${domain}/${domain}.crt "
+    yellow "私钥位于: /root/${domain}/${domain}.key"
+}
 
 menu() {
     clear
     echo "############################################################"
     echo "#                   simple acme                            #"
-    echo "#助您方便申请证书                                          #"
+    echo "#助您方便申请证书                                             #"
     echo "###########################################################"
     echo ""
     echo -e " ${GREEN}1.${PLAIN} 安装 Acme.sh 域名证书申请脚本"
     echo -e " ${GREEN}2.${PLAIN} ${RED}卸载 Acme.sh 域名证书申请脚本${PLAIN}"
     echo " -------------"
     echo -e " ${GREEN}3.${PLAIN} 申请单域名证书 ${YELLOW}(80端口申请)${PLAIN}"
+    echo -e " ${GREEN}3.${PLAIN} 自签证书"
     echo " -------------"
     echo -e " ${GREEN}9.${PLAIN} 切换证书颁发机构"
     echo " -------------"
@@ -160,6 +183,7 @@ menu() {
         1) install_acme ;;
         2) uninstall ;;
         3) start ;;
+        4) own_cert ;;
         9) switch_provider ;;
         *) exit 1 ;;
     esac
