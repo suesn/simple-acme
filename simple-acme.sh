@@ -35,10 +35,14 @@ for ((int = 0; int < ${#REGEX[@]}; int++)); do
     fi
 done
 
+REGEX=("debian" "ubuntu" "centos|red hat|kernel|oracle linux|alma|rocky" "'amazon linux'")
+PACKAGE_UPDATE=("apt-get update" "apt-get update" "yum -y update" "yum -y update")
+PACKAGE_INSTALL=("apt -y install" "apt -y install" "yum -y install" "yum -y install")
+
 install_base(){
-    yellow "正在安装依赖(curl socat)"
-    apt update
-    apt install curl socat -y
+    yellow "正在安装依赖(curl socat lsof)"
+    ${PACKAGE_UPDATE[int]}
+    ${PACKAGE_INSTALL[int]} lsof curl socat
 }
 
 install_acme(){
