@@ -8,9 +8,16 @@
 bash <(curl https://raw.githubusercontent.com/tdjnodj/simple-acme/main/simple-acme.sh)
 ```
 
-多次使用:
+多次使用(稳定版):
+
 ```shell
-wget https://raw.githubusercontent.com/tdjnodj/simple-acme/main/simple-acme.sh && bash simple-acme.sh
+wget https://github.com/tdjnodj/simple-acme/releases/latest/download/simple-acme.sh && bash simple-acme.sh
+```
+
+最新版:
+
+```shell
+bash <(curl -L https://github.com/tdjnodj/simple-acme/releases/latest/download/simple-acme.sh)
 ```
 
 此后运行
