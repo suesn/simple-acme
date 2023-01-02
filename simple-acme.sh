@@ -81,8 +81,8 @@ uninstall() {
 start() {
     read -rp "请输入域名: " domain
     [[ -z $domain ]] && red "未输入域名，无法执行操作！" && exit 1
-    ip4=$(curl -4 ip.sb)
-    ip6=$(curl -6 ip.sb)
+    ip4=$(curl ipv4.ip.sb)
+    ip6=$(curl ipv6.ip.sb)
     server4=$(curl ipget.net/?ip="${domain}" -4)
     server6=$(curl ipget.net/?ip="${domain}" -6)
     baling=$(lsof -i:80)
