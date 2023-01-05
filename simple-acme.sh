@@ -142,19 +142,35 @@ switch_provider(){
 }
 
 own_cert() {
-    read -p "请输入您的域名(支持*): " domain
+    yellow "注: 除域名外其他回车默认"
     echo ""
-    read -p "请输入有效天数: " days
+    echo ""
+    read -p "请输入您的域名(支持*): " domain
+    [[ -z "$domain" ]] && red "请输入域名！" && exit 1
+    echo ""
+    read -p "请输入有效天数(默认:9999): " days
+    [[ -z "$days" ]] && days=9999
+    yellow "当前有效天数: $days"
     echo ""
     read -p "请输入国家代码(可以乱编，示例:CN): " country
+    [[ -z "$country" ]] && country="CN"
+    yellow "当前国家: $country"
     echo ""
-    read -p "请输入行政省名称(可以编，示例: Shanghai): " state
+    read -p "请输入行政省名称(可以编，示例: Guangdong): " state
+    [[ -z "$state" ]] && state="Guangdong"
+    yellow "当前行政省: $state"
     echo ""
     read -p "请输入城市名(可以编，示例: Shanghai): " city
+    [[ -z "$city" ]] && city="Shenzhen"
+    yellow "当前城市: $city"
     echo ""
     read -p "请输入组织名(编，示例: Tencent): " company
+    [[ -z "$company" ]] && company="Tencent"
+    yellow "当前组织: $company"
     echo ""
     read -p "请输入组织单位名(编，示例: Shoping): " section
+    [[ -z "$section" ]] && section="Shoping"
+    yellow "当前单位: $section"
     echo ""
 
     mkdir ~/${domain}
@@ -170,7 +186,7 @@ menu() {
     echo "############################################################"
     echo "#                   simple acme                            #"
     echo "#助您方便申请证书                                             #"
-    echo "###########################################################"
+    echo "#############################################################"
     echo ""
     echo -e " ${GREEN}1.${PLAIN} 安装 Acme.sh 域名证书申请脚本"
     echo -e " ${GREEN}2.${PLAIN} ${RED}卸载 Acme.sh 域名证书申请脚本${PLAIN}"
