@@ -54,6 +54,6 @@ bash simple-acme.sh
 
 主要代码来源: [taffychan-acme](https://github.com/taffychan/acme)
 
-[acme.sh](https://acme.sh/)
+调用脚本: [acme.sh](https://acme.sh/)
 
-[Let's Encrypt](https://letsencrypt.org/)
+特别感谢: [Let's Encrypt](https://letsencrypt.org/)
