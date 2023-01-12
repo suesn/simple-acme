@@ -78,7 +78,7 @@ uninstall() {
     yellow "rm simple-acme.sh"
 }
 
-start() {
+start_http() {
     read -rp "请输入域名: " domain
     [[ -z $domain ]] && red "未输入域名，无法执行操作！" && exit 1
     ip4=$(curl ipv4.ip.sb)
@@ -101,7 +101,7 @@ start() {
     red "如果有请按ctrl + c退出脚本，并使用 kill [pid] 结束进程"
     red "某些VPS自带apache2，如果你不需要，可以用 apt remove apache2 -y 删除！"
     yellow "请尽量关闭CDN申请!"
-
+    echo ""
 
     read -rp "请输入是否使用ipv6申请？(Y/n)" iptype
     if [[ $iptype != n ]]; then
@@ -109,15 +109,52 @@ start() {
     else
         ips="--listen-v4"
     fi
-
+    echo ""
     read -rp "请选择申请模式(standalone(默认):无服务器 nginx:使用nginx apache:使用apache )" type
     if [[ "$type" != "nginx" && "$type" != "apache" && "$type" != "standalone" ]]; then
         type="standalone"
     fi
+    echo ""
+    yellow "ECDSA 证书安全性更高、效率更快，但兼容性更低一点"
+    read -p "是否申请 ECDSA 类型的证书(Y/n)?" answer
+    if [[ "$answer" == "n" ]]; then
+        cert_type=""
+    else
+        cert_type="--keylength ec-256"
+    fi
 
     yellow "即将为 ${domain} 使用 ${type} 申请证书！"
 
-    bash ~/.acme.sh/acme.sh --issue -d ${domain} ${ips} --${type}
+    bash ~/.acme.sh/acme.sh --issue -d ${domain} ${ips} --${type} ${cert_type}
+
+    mkdir ~/${domain}
+    cp ~/.acme.sh/$domain/fullchain.cer ~/${domain}/${domain}.crt
+    cp ~/.acme.sh/$domain/${domain}.key  ~/${domain}/${domain}.key
+    green "如果申请成功，将保存到以下路径"
+    green "证书(链)(fullchain): ~/${domain}/${domain}.crt"
+    green "私钥: ~/${domain}/${domain}.key"
+}
+
+start_txt() {
+    echo ""
+    read -p "请输入域名(可以带 * 号): " domain
+    [[ -z "$domain" ]] && red "请输入域名!" && exit 1
+    echo ""
+    yellow "ECDSA 证书安全性更高、效率更快，但兼容性更低一点"
+    read -p "是否申请 ECDSA 类型的证书(Y/n)?" answer
+    if [[ "$answer" == "n" ]]; then
+        cert_type=""
+    else
+        cert_type="--keylength ec-256"
+    fi
+    yellow "即将开始申请"
+    yellow "等下请留意 绿色 字体的域名和要填写的内容，并手动到 DNS 解析商处填写"
+    yellow "冒红字是正常的，不要在意"
+    sleep 5
+    bash ~/.acme.sh/acme.sh --issue -d ${domain} --dns --yes-I-know-dns-manual-mode-enough-go-ahead-please ${cert_type}
+    green "建议: 填写完后最好等待一分钟，使 DNS 完全解析。"
+    read -p "确认填写完后请回车...... " 
+    bash ~/.acme.sh/acme.sh --renew -d ${domain}  --yes-I-know-dns-manual-mode-enough-go-ahead-please ${cert_type}
 
     mkdir ~/${domain}
     cp ~/.acme.sh/$domain/fullchain.cer ~/${domain}/${domain}.crt
@@ -142,7 +179,7 @@ switch_provider(){
 }
 
 own_cert() {
-    yellow "注: 除域名外其他回车默认"
+    yellow "注: 除域名外，其他值回车即代表使用默认值"
     echo ""
     echo ""
     read -p "请输入您的域名(支持*): " domain
@@ -185,14 +222,17 @@ menu() {
     clear
     echo "############################################################"
     echo "#                   simple acme                            #"
-    echo "#助您方便申请证书                                             #"
+    echo "#助您方便申请证书                                           #"
     echo "#############################################################"
     echo ""
     echo -e " ${GREEN}1.${PLAIN} 安装 Acme.sh 域名证书申请脚本"
     echo -e " ${GREEN}2.${PLAIN} ${RED}卸载 Acme.sh 域名证书申请脚本${PLAIN}"
     echo " -------------"
-    echo -e " ${GREEN}3.${PLAIN} 申请单域名证书 ${YELLOW}(80端口申请)${PLAIN}"
-    echo -e " ${GREEN}3.${PLAIN} 自签证书"
+    echo -e " ${GREEN}3.${PLAIN} 申请单域名证书 ${YELLOW}(通过 80 端口申请)${PLAIN}"
+    echo " -------------"
+    echo -e " ${GREEN}4.${PLAIN} 自签证书(可申请泛域名证书)"
+    echo " -------------"
+    echo -e "${GREEN}5.${PLAIN} 申请单/泛域名证书 ${YELLOW}(手动填写 DNS txt 记录)${PLAIN}"
     echo " -------------"
     echo -e " ${GREEN}9.${PLAIN} 切换证书颁发机构"
     echo " -------------"
@@ -202,8 +242,9 @@ menu() {
     case "$NumberInput" in
         1) install_acme ;;
         2) uninstall ;;
-        3) start ;;
+        3) start_http ;;
         4) own_cert ;;
+        5) start_txt ;;
         9) switch_provider ;;
         *) exit 1 ;;
     esac
