@@ -52,6 +52,12 @@ bash simple-acme.sh
 
 暂时都实现了
 
+# 常见问题
+
+Q: 为什么证书没有自动续签？/为什么手动续签失败？
+
+A: 你需要确保续签的时候80端口占用情况跟申请的时候一样。比如你使用 standalone 模式申请证书，那你续签的时候就不能有 nginx、apache 之类的占用80端口。**所以，建议如果你之后要用网页服务器，那就先安装网页服务器，再使用对应模式申请。**
+
 # Credits
 
 主要代码来源: [taffychan-acme](https://github.com/taffychan/acme)
