@@ -136,6 +136,7 @@ start_http() {
 }
 
 start_txt() {
+    red "警告: 该模式不会自动续签!"
     echo ""
     read -p "请输入域名(可以带 * 号): " domain
     [[ -z "$domain" ]] && red "请输入域名!" && exit 1
@@ -227,6 +228,26 @@ own_cert() {
     yellow "私钥位于: /root/${domain}/${domain}.key"
 }
 
+renew_http() {
+    red "提示: "
+    yellow "1. 如果你使用 http 模式申请，证书会自动续签"
+    yellow "2. DNS 手动模式不能使用"
+    echo ""
+    read -p "输入任意内容继续，按 crtl + c 退出" rubbish
+
+    echo ""
+    read -p "请输入你要续签的域名" domain
+    echo ""
+    read -p "是否为 ecc 证书(y/N)? "answer
+    if [[ "$answer" == "y" ]]; then
+        cert_add1="ecc"
+    else
+        cert_add1=""
+    fi
+
+    acme.sh --renew -d ${domain} --force ${cert_add1}
+}
+
 menu() {
     clear
     echo "############################################################"
@@ -245,6 +266,8 @@ menu() {
     echo " -------------"
     echo -e " ${GREEN}9.${PLAIN} 切换证书颁发机构"
     echo " -------------"
+    echo -e " ${GREEN}10.${PLAIN} 续签证书 ${YELLOW}(仅支持 http 模式)${PLAIN}"
+    echo " -------------"
     echo -e " ${GREEN}0.${PLAIN} 退出脚本"
     echo ""
     read -rp "请输入选项 [0-9]: " NumberInput
@@ -255,6 +278,7 @@ menu() {
         4) own_cert ;;
         5) start_txt ;;
         9) switch_provider ;;
+        10) renew_http ;;
         *) exit 0 ;;
     esac
 }
