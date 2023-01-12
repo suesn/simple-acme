@@ -143,18 +143,27 @@ start_txt() {
     yellow "ECDSA 证书安全性更高、效率更快，但兼容性更低一点"
     read -p "是否申请 ECDSA 类型的证书(Y/n)?" answer
     if [[ "$answer" == "n" ]]; then
-        cert_type=""
+        cert_type="rsa"
     else
-        cert_type="--keylength ec-256"
+        cert_type="ecc"
     fi
+    green "当前申请 ${cert_type} 类型的证书"
+    if [[ "$cert_type" == "rsa"]]; then
+        cert_add1=""
+        cert_add2=""
+    else
+        cert_add1="--keylength ec-256"
+        cert_add2="--ecc"
+    fi
+    echo ""
     yellow "即将开始申请"
-    red "等下请留意 绿色 字体的 "Domain:" 和txt记录 "TXT value:"，并手动到 DNS 解析处填写"
+    red "等下请留意 绿色 字体的 'Domain:' 和txt记录 'TXT value:'，并手动到 DNS 解析处填写"
     yellow "冒红字是正常的，不要在意"
     sleep 5
-    bash ~/.acme.sh/acme.sh --issue -d ${domain} --dns --yes-I-know-dns-manual-mode-enough-go-ahead-please ${cert_type}
+    bash ~/.acme.sh/acme.sh --issue -d ${domain} --dns --yes-I-know-dns-manual-mode-enough-go-ahead-please ${cert_add1}
     green "建议: 填写完后最好等待一分钟，使 DNS 完全解析。"
     read -p "确认填写完后请回车...... " 
-    bash ~/.acme.sh/acme.sh --renew -d ${domain}  --yes-I-know-dns-manual-mode-enough-go-ahead-please
+    bash ~/.acme.sh/acme.sh --renew -d ${domain}  --yes-I-know-dns-manual-mode-enough-go-ahead-please ${cert_add2}
 
     mkdir ~/${domain}
     cp ~/.acme.sh/$domain/fullchain.cer ~/${domain}/${domain}.crt
