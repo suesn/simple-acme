@@ -4,16 +4,16 @@
 
 # 使用
 
-单次使用(最新版)：
-
-```shell
-bash <(curl https://raw.githubusercontent.com/tdjnodj/simple-acme/main/simple-acme.sh)
-```
-
-稳定版:
+单次使用(稳定版)：
 
 ```shell
 bash <(curl -L https://github.com/tdjnodj/simple-acme/releases/latest/download/simple-acme.sh)
+```
+
+最新版:
+
+```shell
+bash <(curl https://raw.githubusercontent.com/tdjnodj/simple-acme/main/simple-acme.sh)
 ```
 
 多次使用(稳定版):
