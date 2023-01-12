@@ -148,7 +148,7 @@ start_txt() {
         cert_type="ecc"
     fi
     green "当前申请 ${cert_type} 类型的证书"
-    if [[ "$cert_type" == "rsa"]]; then
+    if [[ "$cert_type" == "rsa" ]]; then
         cert_add1=""
         cert_add2=""
     else
@@ -255,7 +255,7 @@ menu() {
         4) own_cert ;;
         5) start_txt ;;
         9) switch_provider ;;
-        *) exit 1 ;;
+        *) exit 0 ;;
     esac
 }
 
