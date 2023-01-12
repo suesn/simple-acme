@@ -148,13 +148,13 @@ start_txt() {
         cert_type="--keylength ec-256"
     fi
     yellow "即将开始申请"
-    yellow "等下请留意 绿色 字体的域名和要填写的内容，并手动到 DNS 解析商处填写"
+    red "等下请留意 绿色 字体的 "Domain:" 和txt记录 "TXT value:"，并手动到 DNS 解析处填写"
     yellow "冒红字是正常的，不要在意"
     sleep 5
     bash ~/.acme.sh/acme.sh --issue -d ${domain} --dns --yes-I-know-dns-manual-mode-enough-go-ahead-please ${cert_type}
     green "建议: 填写完后最好等待一分钟，使 DNS 完全解析。"
     read -p "确认填写完后请回车...... " 
-    bash ~/.acme.sh/acme.sh --renew -d ${domain}  --yes-I-know-dns-manual-mode-enough-go-ahead-please ${cert_type}
+    bash ~/.acme.sh/acme.sh --renew -d ${domain}  --yes-I-know-dns-manual-mode-enough-go-ahead-please
 
     mkdir ~/${domain}
     cp ~/.acme.sh/$domain/fullchain.cer ~/${domain}/${domain}.crt
@@ -232,7 +232,7 @@ menu() {
     echo " -------------"
     echo -e " ${GREEN}4.${PLAIN} 自签证书(可申请泛域名证书)"
     echo " -------------"
-    echo -e "${GREEN}5.${PLAIN} 申请单/泛域名证书 ${YELLOW}(手动填写 DNS txt 记录)${PLAIN}"
+    echo -e " ${GREEN}5.${PLAIN} 申请单/泛域名证书 ${YELLOW}(手动填写 DNS txt 记录)${PLAIN}"
     echo " -------------"
     echo -e " ${GREEN}9.${PLAIN} 切换证书颁发机构"
     echo " -------------"
