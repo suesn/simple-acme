@@ -167,8 +167,13 @@ start_txt() {
     bash ~/.acme.sh/acme.sh --renew -d ${domain}  --yes-I-know-dns-manual-mode-enough-go-ahead-please ${cert_add2}
 
     mkdir ~/${domain}
-    cp ~/.acme.sh/$domain/fullchain.cer ~/${domain}/${domain}.crt
-    cp ~/.acme.sh/$domain/${domain}.key  ~/${domain}/${domain}.key
+    if [[ "$cert_type" == "rsa" ]]; then
+        cp ~/.acme.sh/$domain/fullchain.cer ~/${domain}/${domain}.crt
+        cp ~/.acme.sh/$domain/${domain}.key  ~/${domain}/${domain}.key
+    else
+        cp ~/.acme.sh/${domain}_ecc/fullchain.cer ~/${domain}/${domain}.crt
+        cp ~/.acme.sh/${domain}_ecc/${domain}.key  ~/${domain}/${domain}.key
+    fi
     green "如果申请成功，将保存到以下路径"
     green "证书(链)(fullchain): ~/${domain}/${domain}.crt"
     green "私钥: ~/${domain}/${domain}.key"
