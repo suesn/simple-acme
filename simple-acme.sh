@@ -272,10 +272,10 @@ renew_http() {
 
 menu() {
     clear
-    echo "############################################################"
-    echo "#                   simple acme                            #"
-    echo "#助您方便申请证书                                          #"
-    echo "#############################################################"
+    echo " ############################################################"
+    echo " #                   simple acme                            #"
+    echo " #助您方便申请证书                                          #"
+    echo " #############################################################"
     echo ""
     echo -e " ${GREEN}1.${PLAIN} 安装 Acme.sh 域名证书申请脚本"
     echo -e " ${GREEN}2.${PLAIN} ${RED}卸载 Acme.sh 域名证书申请脚本${PLAIN}"
@@ -292,7 +292,7 @@ menu() {
     echo " -------------"
     echo -e " ${GREEN}0.${PLAIN} 退出脚本"
     echo ""
-    read -rp "请输入选项 [0-9]: " NumberInput
+    read -rp " 请输入选项 [0-9]: " NumberInput
     case "$NumberInput" in
         1) install_acme ;;
         2) uninstall ;;
