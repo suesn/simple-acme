@@ -115,21 +115,38 @@ start_http() {
         type="standalone"
     fi
     echo ""
-    yellow "ECDSA 证书安全性更高、效率更快，但兼容性更低一点"
-    read -p "是否申请 ECDSA 类型的证书(Y/n)?" answer
-    if [[ "$answer" == "n" ]]; then
-        cert_type=""
-    else
-        cert_type="--keylength ec-256"
-    fi
+    yellow "ECDSA 证书安全性更高、效率更快，但兼容性更低一点。目前本脚本中只有 Let's encrypt 支持。"
+    yellow "同种证书，数字越大安全性越好，但加密开销更大。"
+    yellow "请选择证书类型:"
+    green "1. ec-256(默认)"
+    yellow "2. ec-384"
+    yellow "3. ec-521"
+    red "4.RSA-2048"
+    red "5. RSA-3072"
+    red "6. RSA-4092"
+    read -p "请选择: " answer
+    case $answer in
+        1) keyLength=ec-256 && ecc=1 ;;
+        2) keyLength=ec-384 && ecc=1 ;;
+        3) keyLength=ec-521 && ecc=1 ;;
+        4) keyLength=2048 && ecc=0 ;;
+        5) keyLength=3072 && ecc=0 ;;
+        6) keyLength=4092 && ecc=0 ;;
+        *) keyLength=ec-256 && ecc=1 ;;
+    esac
 
-    yellow "即将为 ${domain} 使用 ${type} 申请证书！"
+    yellow "即将为 ${domain} 使用 ${type} 申请 $keyLength 证书！"
 
-    bash ~/.acme.sh/acme.sh --issue -d ${domain} ${ips} --${type} ${cert_type}
+    bash ~/.acme.sh/acme.sh --issue -d ${domain} ${ips} --${type} --keylength ${keyLength}
 
     mkdir ~/${domain}
-    cp ~/.acme.sh/$domain/fullchain.cer ~/${domain}/${domain}.crt
-    cp ~/.acme.sh/$domain/${domain}.key  ~/${domain}/${domain}.key
+    if [ "$ecc" == "0" ]; then
+        cp ~/.acme.sh/$domain/fullchain.cer ~/${domain}/${domain}.crt
+        cp ~/.acme.sh/$domain/${domain}.key  ~/${domain}/${domain}.key
+    else
+        cp ~/.acme.sh/${domain}_ecc/fullchain.cer ~/${domain}/${domain}.crt
+        cp ~/.acme.sh/${domain}_ecc/${domain}.key  ~/${domain}/${domain}.key
+    fi
     green "如果申请成功，将保存到以下路径"
     green "证书(链)(fullchain): ~/${domain}/${domain}.crt"
     green "私钥: ~/${domain}/${domain}.key"
