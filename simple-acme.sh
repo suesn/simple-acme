@@ -110,12 +110,20 @@ start_http() {
         ips="--listen-v4"
     fi
     echo ""
-    read -rp "请选择申请模式(standalone(默认):无服务器 nginx:使用nginx apache:使用apache )" type
-    if [[ "$type" != "nginx" && "$type" != "apache" && "$type" != "standalone" ]]; then
-        type="standalone"
-    fi
+    yellow "选择申请模式"
+    yellow " 1. standalone(默认): acme.sh 充当 web 服务器"
+    green " 2. nginx: 使用 nginx 申请"
+    red " 3. apache: 使用 apache(2) 申请"
+    read -p "请选择: " answer
+    case $answer in
+        1) serverType=standalone ;;
+        2) serverType=nginx ;;
+        3) serverType=apache ;;
+        *) red "standalone" && serverType=standalone ;;
+    esac
+    yellow "当前申请模式: $serverType"
     echo ""
-    yellow "ECDSA 证书安全性更高、效率更快，但兼容性更低一点。目前本脚本中只有 Let's encrypt 支持。"
+    yellow "ECDSA 证书安全性更高、效率更高，但兼容性更低一点。目前本脚本中只有 Let's encrypt 支持。"
     yellow "同种证书，数字越大安全性越好，但加密开销更大。"
     yellow "请选择证书类型:"
     green "1. ec-256(默认)"
@@ -135,9 +143,9 @@ start_http() {
         *) keyLength=ec-256 && ecc=1 ;;
     esac
 
-    yellow "即将为 ${domain} 使用 ${type} 申请 $keyLength 证书！"
+    yellow "即将为 ${domain} 使用 ${serverType} 申请 $keyLength 证书！"
 
-    bash ~/.acme.sh/acme.sh --issue -d ${domain} ${ips} --${type} --keylength ${keyLength}
+    bash ~/.acme.sh/acme.sh --issue -d ${domain} ${ips} --${serverType} --keylength ${keyLength}
 
     mkdir ~/${domain}
     if [ "$ecc" == "0" ]; then
@@ -199,6 +207,9 @@ start_txt() {
 switch_provider(){
     yellow "请选择证书提供商, 默认通过 Letsencrypt.org 来申请证书 "
     yellow "如果证书申请失败, 例如一天内通过 Letsencrypt.org 申请次数过多, 可选 BuyPass.com 或 ZeroSSL.com 来申请."
+    echo ""
+    green "本脚本很多功能只有 Let's encrypt 支持，请尽量使用！"
+    echo ""
     echo -e " ${GREEN}1.${PLAIN} Letsencrypt.org"
     echo -e " ${GREEN}2.${PLAIN} BuyPass.com"
     echo -e " ${RED}3.${PLAIN} ZeroSSL.com(有发放限制，不推荐)"
