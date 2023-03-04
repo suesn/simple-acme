@@ -278,7 +278,33 @@ renew_http() {
         cert_add1=""
     fi
 
-    acme.sh --renew -d ${domain} --force ${cert_add1}
+    bash ~/.acme.sh/acme.sh --renew -d ${domain} --force ${cert_add1}
+}
+
+install_cert() {
+    echo ""
+    read -p " 请输入域名(必须先用 acme.sh 申请过证书！)" domain
+    echo ""
+    yellow " 请选择安装的程序: "
+    red " 1. apache2"
+    green " 2. nginx"
+    yellow " 3. 自定义"
+    read -p "请选择: " answer
+    if [ "$answer" == "1" ]; then
+        bash ~/.acme.sh/acme.sh --install-cert -d ${domain} --reloadcmd  "service apache2 force-reload"
+    elif [ "$answer" == "2" ]; then
+        bash ~/.acme.sh/acme.sh --install-cert -d ${domain} --reloadcmd  "service nginx force-reload"
+    else
+        yellow "请输入你想安装到的路径(例: /etc/nginx/cert.pem): "
+        read -p "证书: " cert
+        yellow "即将安装 证书 到 $cert"
+        echo ""
+        read -p "密钥: " key
+        yellow "即将安装 密钥 到 $key"
+        echo ""
+        read -p "请输入重载目标程序的命令(例: systemctl reload nginx): " reloadOrder
+        bash ~/.acme.sh/acme.sh --install-cert -d ${domain} --reloadcmd  "${reloadOrder}" --key-file "$key" --fullchain-file "$cert"
+    fi
 }
 
 menu() {
@@ -301,6 +327,8 @@ menu() {
     echo " -------------"
     echo -e " ${GREEN}10.${PLAIN} 续签证书 ${YELLOW}(仅支持 http 模式)${PLAIN}"
     echo " -------------"
+    echo -e " ${GREEN}20.${PLAIN} 为网页服务器安装证书"
+    echo " -------------"
     echo -e " ${GREEN}0.${PLAIN} 退出脚本"
     echo ""
     read -rp " 请输入选项 [0-9]: " NumberInput
@@ -312,6 +340,7 @@ menu() {
         5) start_txt ;;
         9) switch_provider ;;
         10) renew_http ;;
+        20) install_cert ;;
         *) exit 0 ;;
     esac
 }
