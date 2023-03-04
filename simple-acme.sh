@@ -386,7 +386,7 @@ menu() {
     echo -e " ${GREEN}2.${PLAIN} ${RED}卸载 Acme.sh 域名证书申请脚本${PLAIN}"
     echo " -------------"
     echo -e " ${GREEN}3.${PLAIN} 申请单域名证书 ${YELLOW}(通过 80 端口申请/http 模式)${PLAIN}"
-    echo -e " ${GREEN}3.${PLAIN} 申请单域名证书 ${YELLOW}(通过 443 端口申请/alpn 模式)${PLAIN}"
+    echo -e " ${GREEN}4.${PLAIN} 申请单域名证书 ${YELLOW}(通过 443 端口申请/alpn 模式)${PLAIN}"
     echo " -------------"
     echo -e " ${GREEN}5.${PLAIN} 自签证书(可申请泛域名证书)"
     echo " -------------"
