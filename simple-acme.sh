@@ -160,6 +160,74 @@ start_http() {
     green "私钥: ~/${domain}/${domain}.key"
 }
 
+start_alpn() {
+    read -rp "请输入域名: " domain
+    [[ -z $domain ]] && red "未输入域名，无法执行操作！" && exit 1
+    ip4=$(curl ipv4.ip.sb)
+    ip6=$(curl ipv6.ip.sb)
+    server4=$(curl ipget.net/?ip="${domain}" -4)
+    server6=$(curl ipget.net/?ip="${domain}" -6)
+
+    green "当前vps的ipv4为 $ip4"
+    green "当前vps的ipv6为 $ip6"
+
+    yellow "输入域名的ipv4为 $server4"
+    yellow "输入域名的ipv6为 $server6"
+
+    red "80端口占用（没有内容代表没占用）： "
+    lsof -i :443
+
+    echo ""
+    red "请检查域名是否解析到 ip,并检查 443 端口是否占用！"
+    red "如果有请按ctrl + c退出脚本，并使用 kill [pid] 结束进程"
+    yellow "请尽量关闭CDN申请!"
+    echo ""
+
+    read -rp "请输入是否使用ipv6申请？(Y/n)" iptype
+    if [[ $iptype != n ]]; then
+        ips="--listen-v6"
+    else
+        ips="--listen-v4"
+    fi
+
+    echo ""
+    yellow "ECDSA 证书安全性更高、效率更高，但兼容性更低一点。目前本脚本中只有 Let's encrypt 支持。"
+    yellow "同种证书，数字越大安全性越好，但加密开销更大。"
+    yellow "请选择证书类型:"
+    green "1. ec-256(默认)"
+    yellow "2. ec-384"
+    yellow "3. ec-521"
+    red "4.RSA-2048"
+    red "5. RSA-3072"
+    red "6. RSA-4092"
+    read -p "请选择: " answer
+    case $answer in
+        1) keyLength=ec-256 && ecc=1 ;;
+        2) keyLength=ec-384 && ecc=1 ;;
+        3) keyLength=ec-521 && ecc=1 ;;
+        4) keyLength=2048 && ecc=0 ;;
+        5) keyLength=3072 && ecc=0 ;;
+        6) keyLength=4092 && ecc=0 ;;
+        *) keyLength=ec-256 && ecc=1 ;;
+    esac
+
+    yellow "即将为 ${domain} 申请 $keyLength 证书！"
+
+    bash ~/.acme.sh/acme.sh --issue -d ${domain} ${ips} --alpn --keylength ${keyLength}
+
+    mkdir ~/${domain}
+    if [ "$ecc" == "0" ]; then
+        cp ~/.acme.sh/$domain/fullchain.cer ~/${domain}/${domain}.crt
+        cp ~/.acme.sh/$domain/${domain}.key  ~/${domain}/${domain}.key
+    else
+        cp ~/.acme.sh/${domain}_ecc/fullchain.cer ~/${domain}/${domain}.crt
+        cp ~/.acme.sh/${domain}_ecc/${domain}.key  ~/${domain}/${domain}.key
+    fi
+    green "如果申请成功，将保存到以下路径"
+    green "证书(链)(fullchain): ~/${domain}/${domain}.crt"
+    green "私钥: ~/${domain}/${domain}.key"
+}
+
 start_txt() {
     red "警告: 该模式不会自动续签!"
     echo ""
@@ -317,11 +385,12 @@ menu() {
     echo -e " ${GREEN}1.${PLAIN} 安装 Acme.sh 域名证书申请脚本"
     echo -e " ${GREEN}2.${PLAIN} ${RED}卸载 Acme.sh 域名证书申请脚本${PLAIN}"
     echo " -------------"
-    echo -e " ${GREEN}3.${PLAIN} 申请单域名证书 ${YELLOW}(通过 80 端口申请)${PLAIN}"
+    echo -e " ${GREEN}3.${PLAIN} 申请单域名证书 ${YELLOW}(通过 80 端口申请/http 模式)${PLAIN}"
+    echo -e " ${GREEN}3.${PLAIN} 申请单域名证书 ${YELLOW}(通过 443 端口申请/alpn 模式)${PLAIN}"
     echo " -------------"
-    echo -e " ${GREEN}4.${PLAIN} 自签证书(可申请泛域名证书)"
+    echo -e " ${GREEN}5.${PLAIN} 自签证书(可申请泛域名证书)"
     echo " -------------"
-    echo -e " ${GREEN}5.${PLAIN} 申请单/泛域名证书 ${YELLOW}(手动填写 DNS txt 记录)${PLAIN}"
+    echo -e " ${GREEN}6.${PLAIN} 申请单/泛域名证书 ${YELLOW}(手动填写 DNS txt 记录)${PLAIN}"
     echo " -------------"
     echo -e " ${GREEN}9.${PLAIN} 切换证书颁发机构"
     echo " -------------"
@@ -336,8 +405,9 @@ menu() {
         1) install_acme ;;
         2) uninstall ;;
         3) start_http ;;
-        4) own_cert ;;
-        5) start_txt ;;
+        4) start_alpn ;;
+        5) own_cert ;;
+        6) start_txt ;;
         9) switch_provider ;;
         10) renew_http ;;
         20) install_cert ;;
