@@ -302,7 +302,7 @@ install_cert() {
         read -p "密钥: " key
         yellow "即将安装 密钥 到 $key"
         echo ""
-        read -p "请输入重载目标程序的命令(例: systemctl reload nginx): " reloadOrder
+        read -p "请输入重载目标程序的命令(例: systemctl reload nginx / xui restar): " reloadOrder
         bash ~/.acme.sh/acme.sh --install-cert -d ${domain} --reloadcmd  "${reloadOrder}" --key-file "$key" --fullchain-file "$cert"
     fi
 }
