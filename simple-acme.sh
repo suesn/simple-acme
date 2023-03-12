@@ -287,7 +287,7 @@ switch_provider(){
         1) bash ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt && green "切换证书提供商为 Letsencrypt.org 成功！" ;;
         2) bash ~/.acme.sh/acme.sh --set-default-ca --server buypass && green "切换证书提供商为 BuyPass.com 成功！" ;;
         3) bash ~/.acme.sh/acme.sh --set-default-ca --server zerossl && green "切换证书提供商为 ZeroSSL.com 成功！" ;;
-        4) bash ~/.acme.sh/acme.sh --set-default-ca --server https://acme-staging-v02.api.letsencrypt.org/directory && red " 切换证书提供商为 Letsencrypt.org (测试版) 成功!"
+        4) bash ~/.acme.sh/acme.sh --set-default-ca --server https://acme-staging-v02.api.letsencrypt.org/directory && red " 切换证书提供商为 Letsencrypt.org (测试版) 成功!" ;;
         *) bash ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt && green "切换证书提供商为 Letsencrypt.org 成功！" ;;
     esac
 }
