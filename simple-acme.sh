@@ -281,10 +281,13 @@ switch_provider(){
     echo -e " ${GREEN}1.${PLAIN} Letsencrypt.org"
     echo -e " ${GREEN}2.${PLAIN} BuyPass.com"
     echo -e " ${RED}3.${PLAIN} ZeroSSL.com(有发放限制，不推荐)"
+    echo -e " ${RED}4.${PLAIN} Letsencrypt.org ${RED}测试版${PLAIN}"
     read -rp "请选择证书提供商 [1-3，默认1]: " provider
     case $provider in
+        1) bash ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt && green "切换证书提供商为 Letsencrypt.org 成功！" ;;
         2) bash ~/.acme.sh/acme.sh --set-default-ca --server buypass && green "切换证书提供商为 BuyPass.com 成功！" ;;
         3) bash ~/.acme.sh/acme.sh --set-default-ca --server zerossl && green "切换证书提供商为 ZeroSSL.com 成功！" ;;
+        4) bash ~/.acme.sh/acme.sh --set-default-ca --server https://acme-staging-v02.api.letsencrypt.org/directory && red " 切换证书提供商为 Letsencrypt.org (测试版) 成功!"
         *) bash ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt && green "切换证书提供商为 Letsencrypt.org 成功！" ;;
     esac
 }
