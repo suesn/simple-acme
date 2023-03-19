@@ -1,5 +1,7 @@
 #!/bin/bash
 
+VERSION="1.5.0"
+
 RED="\033[31m"
 GREEN="\033[32m"
 YELLOW="\033[33m"
@@ -39,6 +41,22 @@ REGEX=("debian" "ubuntu" "centos|red hat|kernel|oracle linux|alma|rocky" "'amazo
 PACKAGE_UPDATE=("apt-get update" "apt-get update" "yum -y update" "yum -y update")
 PACKAGE_INSTALL=("apt -y install" "apt -y install" "yum -y install" "yum -y install")
 
+check_install
+
+check_install(){
+    if [ -e /usr/local/bin/simple-acme.sh ]; then
+        red "检测到未安装 simple-acme.sh，正在安装"
+        mv $0 /usr/local/bin/simple-acme.sh
+        chmod +x /usr/local/bin/simple-acme.sh
+        if [ -e /usr/local/bin/simple-acme.sh ]; then
+            red "安装失败！"
+            exit 1
+        else
+            green "已成功安装！下次运行直接输入 simple-acme.sh 即可！"
+        fi
+    fi
+}
+
 install_base(){
     yellow "正在安装依赖(curl socat lsof)"
     ${PACKAGE_UPDATE[int]}
@@ -55,6 +73,7 @@ install_acme(){
     fi
     curl https://get.acme.sh | sh -s email=$acmeEmail
     source ~/.bashrc
+    chmod +x ~/.acme.sh/acme.sh
     alias acme.sh=~/.acme.sh/acme.sh
     bash ~/.acme.sh/acme.sh --upgrade --auto-upgrade
     bash ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt
@@ -383,9 +402,10 @@ menu() {
     echo " ############################################################"
     echo " #                   simple acme                            #"
     echo " #助您方便申请证书                                          #"
+    echo " #版本：$VERSION"
     echo " #############################################################"
     echo ""
-    echo -e " ${GREEN}1.${PLAIN} 安装 Acme.sh 域名证书申请脚本"
+    echo -e " ${GREEN}1.${PLAIN} 安装/更新 Acme.sh 域名证书申请脚本"
     echo -e " ${GREEN}2.${PLAIN} ${RED}卸载 Acme.sh 域名证书申请脚本${PLAIN}"
     echo " -------------"
     echo -e " ${GREEN}3.${PLAIN} 申请单域名证书 ${YELLOW}(通过 80 端口申请/http 模式)${PLAIN}"
