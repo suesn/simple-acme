@@ -41,18 +41,17 @@ REGEX=("debian" "ubuntu" "centos|red hat|kernel|oracle linux|alma|rocky" "'amazo
 PACKAGE_UPDATE=("apt-get update" "apt-get update" "yum -y update" "yum -y update")
 PACKAGE_INSTALL=("apt -y install" "apt -y install" "yum -y install" "yum -y install")
 
-check_install
-
-check_install(){
-    if [ -e /usr/local/bin/simple-acme.sh ]; then
+check_install() {
+    if [ ! -e /usr/local/bin/simple-acme.sh ]; then
         red "检测到未安装 simple-acme.sh，正在安装"
         mv $0 /usr/local/bin/simple-acme.sh
         chmod +x /usr/local/bin/simple-acme.sh
-        if [ -e /usr/local/bin/simple-acme.sh ]; then
+        if [ ! -e /usr/local/bin/simple-acme.sh ]; then
             red "安装失败！"
             exit 1
         else
             green "已成功安装！下次运行直接输入 simple-acme.sh 即可！"
+            rm $0
         fi
     fi
 }
@@ -397,13 +396,31 @@ install_cert() {
     fi
 }
 
+renew_simple() {
+    newVersion=$(curl -L https://raw.githubusercontent.com/tdjnodj/simple-acme/main/VERSION)
+    if [ "$newVersion" != "$VERSION" ]; then
+        red "检测到版本变化: "
+        yellow "当前版本: $VERSION"
+        yellow "最新版本: $newVersion"
+        read -p "是否更新？(Y/n)" answer
+        if [ "$answer" == "n" ] || [ "$answer" == "N" ]; then
+            exit 0
+        else
+            wget https://github.com/tdjnodj/simple-acme/releases/latest/download/simple-acme.sh -O /usr/local/bin/simple-acme.sh
+            chmod +x /usr/local/bin/simple-acme.sh
+            green "更新成功！"
+        fi
+    fi
+}
+
 menu() {
     clear
     echo " ############################################################"
     echo " #                   simple acme                            #"
     echo " #助您方便申请证书                                          #"
-    echo " #版本：$VERSION"
-    echo " #############################################################"
+    echo " #版本：$VERSION                                               #"
+    echo -e " #快捷命令: ${GREEN} simple-acme.sh ${PLAIN}                                #"
+    echo " ############################################################"
     echo ""
     echo -e " ${GREEN}1.${PLAIN} 安装/更新 Acme.sh 域名证书申请脚本"
     echo -e " ${GREEN}2.${PLAIN} ${RED}卸载 Acme.sh 域名证书申请脚本${PLAIN}"
@@ -420,6 +437,7 @@ menu() {
     echo -e " ${GREEN}10.${PLAIN} 续签证书 ${YELLOW}(仅支持 http 模式)${PLAIN}"
     echo " -------------"
     echo -e " ${GREEN}20.${PLAIN} 为网页服务器安装证书"
+    echo -e " ${GREEN}21.${PLAIN} ${RED}更新 simple-acme.sh ${PLAIN}"
     echo " -------------"
     echo -e " ${GREEN}0.${PLAIN} 退出脚本"
     echo ""
@@ -434,8 +452,11 @@ menu() {
         9) switch_provider ;;
         10) renew_http ;;
         20) install_cert ;;
+        21) renew_simple ;;
         *) exit 0 ;;
     esac
 }
+
+check_install
 
 menu
