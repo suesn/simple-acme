@@ -4,18 +4,9 @@
 
 # 使用
 
-单次使用：
-
 ```shell
 bash <(curl -L https://github.com/tdjnodj/simple-acme/releases/latest/download/simple-acme.sh)
 ```
-
-多次使用:
-
-```shell
-wget https://github.com/tdjnodj/simple-acme/releases/latest/download/simple-acme.sh && bash simple-acme.sh
-```
-
 
 此后运行
 ```shell
