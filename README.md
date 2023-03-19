@@ -8,11 +8,10 @@
 bash <(curl -L https://github.com/tdjnodj/simple-acme/releases/latest/download/simple-acme.sh)
 ```
 
-此后运行
+此后使用:
 ```shell
-bash simple-acme.sh
+simple-acme.sh
 ```
-即可
 
 # 特性
 
