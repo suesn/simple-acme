@@ -166,13 +166,7 @@ start_http() {
     bash ~/.acme.sh/acme.sh --issue -d ${domain} ${ips} --${serverType} --keylength ${keyLength}
 
     mkdir ~/${domain}
-    if [ "$ecc" == "0" ]; then
-        cp ~/.acme.sh/$domain/fullchain.cer ~/${domain}/${domain}.crt
-        cp ~/.acme.sh/$domain/${domain}.key  ~/${domain}/${domain}.key
-    else
-        cp ~/.acme.sh/${domain}_ecc/fullchain.cer ~/${domain}/${domain}.crt
-        cp ~/.acme.sh/${domain}_ecc/${domain}.key  ~/${domain}/${domain}.key
-    fi
+    bash ~/.acme.sh/acme.sh --install-cert -d $domain --key-file ~/${domain}/${domain}.key --fullchain-file ~/${domain}/${domain}.crt
     green "如果申请成功，将保存到以下路径"
     green "证书(链)(fullchain): ~/${domain}/${domain}.crt"
     green "私钥: ~/${domain}/${domain}.key"
@@ -234,13 +228,7 @@ start_alpn() {
     bash ~/.acme.sh/acme.sh --issue -d ${domain} ${ips} --alpn --keylength ${keyLength}
 
     mkdir ~/${domain}
-    if [ "$ecc" == "0" ]; then
-        cp ~/.acme.sh/$domain/fullchain.cer ~/${domain}/${domain}.crt
-        cp ~/.acme.sh/$domain/${domain}.key  ~/${domain}/${domain}.key
-    else
-        cp ~/.acme.sh/${domain}_ecc/fullchain.cer ~/${domain}/${domain}.crt
-        cp ~/.acme.sh/${domain}_ecc/${domain}.key  ~/${domain}/${domain}.key
-    fi
+    bash ~/.acme.sh/acme.sh --install-cert -d $domain --key-file ~/${domain}/${domain}.key --fullchain-file ~/${domain}/${domain}.crt
     green "如果申请成功，将保存到以下路径"
     green "证书(链)(fullchain): ~/${domain}/${domain}.crt"
     green "私钥: ~/${domain}/${domain}.key"
@@ -278,13 +266,7 @@ start_txt() {
     bash ~/.acme.sh/acme.sh --renew -d ${domain}  --yes-I-know-dns-manual-mode-enough-go-ahead-please ${cert_add2}
 
     mkdir ~/${domain}
-    if [[ "$cert_type" == "rsa" ]]; then
-        cp ~/.acme.sh/$domain/fullchain.cer ~/${domain}/${domain}.crt
-        cp ~/.acme.sh/$domain/${domain}.key  ~/${domain}/${domain}.key
-    else
-        cp ~/.acme.sh/${domain}_ecc/fullchain.cer ~/${domain}/${domain}.crt
-        cp ~/.acme.sh/${domain}_ecc/${domain}.key  ~/${domain}/${domain}.key
-    fi
+    bash ~/.acme.sh/acme.sh --install-cert -d $domain --key-file ~/${domain}/${domain}.key --fullchain-file ~/${domain}/${domain}.crt
     green "如果申请成功，将保存到以下路径"
     green "证书(链)(fullchain): ~/${domain}/${domain}.crt"
     green "私钥: ~/${domain}/${domain}.key"
@@ -299,7 +281,7 @@ switch_provider(){
     echo -e " ${GREEN}1.${PLAIN} Letsencrypt.org"
     echo -e " ${GREEN}2.${PLAIN} BuyPass.com"
     echo -e " ${RED}3.${PLAIN} ZeroSSL.com(有发放限制，不推荐)"
-    echo -e " ${RED}4.${PLAIN} Letsencrypt.org ${RED}测试版${PLAIN}"
+    echo -e " ${RED}4.${PLAIN} Letsencrypt.org (${RED}测试版，不受浏览器信任${PLAIN})"
     read -rp "请选择证书提供商 [1-3，默认1]: " provider
     case $provider in
         1) bash ~/.acme.sh/acme.sh --set-default-ca --server letsencrypt && green "切换证书提供商为 Letsencrypt.org 成功！" ;;
