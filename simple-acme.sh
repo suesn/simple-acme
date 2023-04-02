@@ -236,41 +236,45 @@ start_alpn() {
 }
 
 start_txt() {
-    red "警告: 该模式不会自动续签!"
+    red " 警告: 该模式不会自动续签!"
     echo ""
-    read -p "请输入域名(可以带 * 号): " domain
+    read -p " 请输入域名(可以带 * 号): " domain
     [[ -z "$domain" ]] && red "请输入域名!" && exit 1
     echo ""
-    yellow "ECDSA 证书安全性更高、效率更快，但兼容性更低一点"
-    read -p "是否申请 ECDSA 类型的证书(Y/n)?" answer
-    if [[ "$answer" == "n" ]]; then
-        cert_type="rsa"
-    else
-        cert_type="ecc"
-    fi
-    green "当前申请 ${cert_type} 类型的证书"
-    if [[ "$cert_type" == "rsa" ]]; then
-        cert_add1=""
-        cert_add2=""
-    else
-        cert_add1="--keylength ec-256"
-        cert_add2="--ecc"
-    fi
+    yellow " ECDSA 证书安全性更高、效率更高，但兼容性更低一点。目前本脚本中只有 Let's encrypt 支持。"
+    yellow " 同种证书，数字越大安全性越好，但加密开销更大。"
+    yellow " 请选择证书类型:"
+    green " 1. ec-256(默认)"
+    yellow " 2. ec-384"
+    yellow " 3. ec-521"
+    red " 4.RSA-2048"
+    red " 5. RSA-3072"
+    red " 6. RSA-4092"
+    read -p " 请选择: " answer
+    case $answer in
+        1) keyLength=ec-256 ;;
+        2) keyLength=ec-384 ;;
+        3) keyLength=ec-521 ;;
+        4) keyLength=2048 ;;
+        5) keyLength=3072 ;;
+        6) keyLength=4092 ;;
+        *) keyLength=ec-256 ;;
+    esac
     echo ""
-    yellow "即将开始申请"
-    red "等下请留意 绿色 字体的 'Domain:' 和txt记录 'TXT value:'，并手动到 DNS 解析处填写"
-    yellow "冒红字是正常的，不要在意"
+    yellow " 即将开始申请"
+    echo -e " 等下请留意 ${GREEN}绿色${PLAIN} 字体的 ${BLUE}\"Domain:\"${PLAIN} 和 ${YELLOW}txt${PLAIN} 记录 ${BLUE}\"TXT value:\"${PLAIN}，并手动到 DNS 解析处填写"
+    yellow " 冒红字是正常的，不要在意"
     sleep 5
-    bash ~/.acme.sh/acme.sh --issue -d ${domain} --dns --yes-I-know-dns-manual-mode-enough-go-ahead-please ${cert_add1}
-    green "建议: 填写完后最好等待一分钟，使 DNS 完全解析。"
+    bash ~/.acme.sh/acme.sh --issue -d ${domain} --dns --yes-I-know-dns-manual-mode-enough-go-ahead-please ${cert_add1} --keylength $keyLength
+    green " 建议: 填写完后最好等待一分钟，使 DNS 完全解析。"
     read -p "确认填写完后请回车...... " 
-    bash ~/.acme.sh/acme.sh --renew -d ${domain}  --yes-I-know-dns-manual-mode-enough-go-ahead-please ${cert_add2}
+    bash ~/.acme.sh/acme.sh --renew -d ${domain}  --yes-I-know-dns-manual-mode-enough-go-ahead-please ${cert_add2} --keylength $keyLength
 
     mkdir ~/${domain}
     bash ~/.acme.sh/acme.sh --install-cert -d $domain --key-file ~/${domain}/${domain}.key --fullchain-file ~/${domain}/${domain}.crt
-    green "如果申请成功，将保存到以下路径"
-    green "证书(链)(fullchain): ~/${domain}/${domain}.crt"
-    green "私钥: ~/${domain}/${domain}.key"
+    green " 如果申请成功，将保存到以下路径"
+    green " 证书(链)(fullchain): ~/${domain}/${domain}.crt"
+    green " 私钥: ~/${domain}/${domain}.key"
 }
 
 start_API() {
