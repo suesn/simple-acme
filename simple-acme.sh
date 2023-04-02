@@ -5,6 +5,7 @@ VERSION="1.5.1"
 RED="\033[31m"
 GREEN="\033[32m"
 YELLOW="\033[33m"
+BLUE="\033[36m"
 PLAIN='\033[0m'
 
 red(){
@@ -272,6 +273,60 @@ start_txt() {
     green "私钥: ~/${domain}/${domain}.key"
 }
 
+start_API() {
+    echo ""
+    yellow " 请先阅读：https://github.com/tdjnodj/simple-acme/wiki/%E4%BD%BF%E7%94%A8-cloudflare-API-%E7%94%B3%E8%AF%B7%E8%AF%81%E4%B9%A6"
+    echo ""
+    read -p " 请输入 cloudflare DNS 令牌： " cfToken
+    [ -z "$cfToken" ] && red "请输入！"
+    echo -e " 当前 cloudflare DNS 令牌： $YELLOW $cfToken $PLAIN"
+    echo ""
+    read -p " 请输入 cloudflare 区域 ID： " cfAccountID
+    [ -z "$cfAccountID" ] && red "请输入！"
+    echo -e " 当前 cloudflare 区域 ID： $RED $cfAccountID $PLAIN"
+    echo ""
+    read -p " 请输入 cloudflare 账户 ID： " cfZoneID
+    [ -z "$cfZoneID" ] && red "请输入！"
+    echo -e " 当前 cloudflare 区域 ID： $RED $cfZoneID $PLAIN"
+    echo ""
+    read -p " 请输入域名(可以带 * 号): " domain
+    [[ -z "$domain" ]] && red "请输入域名!" && exit 1
+    echo ""
+    yellow " ECDSA 证书安全性更高、效率更高，但兼容性更低一点。目前本脚本中只有 Let's encrypt 支持。"
+    yellow " 同种证书，数字越大安全性越好，但加密开销更大。"
+    yellow " 请选择证书类型:"
+    green " 1. ec-256(默认)"
+    yellow " 2. ec-384"
+    yellow " 3. ec-521"
+    red " 4.RSA-2048"
+    red " 5. RSA-3072"
+    red " 6. RSA-4092"
+    read -p " 请选择: " answer
+    case $answer in
+        1) keyLength=ec-256 ;;
+        2) keyLength=ec-384 ;;
+        3) keyLength=ec-521 ;;
+        4) keyLength=2048 ;;
+        5) keyLength=3072 ;;
+        6) keyLength=4092 ;;
+        *) keyLength=ec-256 ;;
+    esac
+    echo ""
+    echo -e " 即将为 $GREEN $domain $PLAIN 使用 $YELLOW cloudflare $PLAIN API 申请 $BLUE $keyLength $PLAIN 证书"
+
+
+    export CF_Token="$cfToken"
+    export CF_Account_ID="$cfAccountID"
+    export CF_Zone_ID="$cfZoneID"
+    bash ~/.acme.sh/acme.sh --issue --dns dns_cf -d $domain --keylength $keyLength
+
+    mkdir ~/${domain}
+    bash ~/.acme.sh/acme.sh --install-cert -d $domain --key-file ~/${domain}/${domain}.key --fullchain-file ~/${domain}/${domain}.crt
+    green " 如果申请成功，将保存到以下路径"
+    green " 证书(链)(fullchain): ~/${domain}/${domain}.crt"
+    green " 私钥: ~/${domain}/${domain}.key"
+}
+
 switch_provider(){
     yellow "请选择证书提供商, 默认通过 Letsencrypt.org 来申请证书 "
     yellow "如果证书申请失败, 例如一天内通过 Letsencrypt.org 申请次数过多, 可选 BuyPass.com 或 ZeroSSL.com 来申请."
@@ -413,6 +468,7 @@ menu() {
     echo -e " ${GREEN}5.${PLAIN} 自签证书(可申请泛域名证书)"
     echo " -------------"
     echo -e " ${GREEN}6.${PLAIN} 申请单/泛域名证书 ${YELLOW}(手动填写 DNS txt 记录)${PLAIN}"
+    echo -e " ${GREEN}7.${PLAIN} 申请单/泛域名证书 ${YELLOW}(利用 cloudflare API)${PLAIN}"
     echo " -------------"
     echo -e " ${GREEN}9.${PLAIN} 切换证书颁发机构"
     echo " -------------"
@@ -431,6 +487,7 @@ menu() {
         4) start_alpn ;;
         5) own_cert ;;
         6) start_txt ;;
+        7) start_API ;;
         9) switch_provider ;;
         10) renew_http ;;
         20) install_cert ;;
