@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION="1.5.1"
+VERSION="1.6.1"
 
 RED="\033[31m"
 GREEN="\033[32m"
@@ -44,8 +44,9 @@ PACKAGE_INSTALL=("apt -y install" "apt -y install" "yum -y install" "yum -y inst
 
 check_install() {
     if [ ! -e /usr/local/bin/simple-acme.sh ]; then
-        red "检测到未安装 simple-acme.sh，正在安装"
-        curl -L https://github.com/tdjnodj/simple-acme/releases/latest/download/simple-acme.sh -o /usr/local/bin/simple-acme.sh
+        red "检测到未安装 simple-acme.sh，开始安装"
+        newVersion=$(curl -L https://raw.githubusercontent.com/tdjnodj/simple-acme/main/VERSION)
+        curl -L https://github.com/tdjnodj/simple-acme/releases/download/${newVersion}/simple-acme.sh -o /usr/local/bin/simple-acme.sh
         chmod +x /usr/local/bin/simple-acme.sh
         if [ ! -e /usr/local/bin/simple-acme.sh ]; then
             red "安装失败！"
@@ -447,7 +448,7 @@ renew_simple() {
         if [ "$answer" == "n" ] || [ "$answer" == "N" ]; then
             exit 0
         else
-            wget https://github.com/tdjnodj/simple-acme/releases/latest/download/simple-acme.sh -O /usr/local/bin/simple-acme.sh
+            curl -L https://github.com/tdjnodj/simple-acme/releases/download/${newVersion}/simple-acme.sh -o /usr/local/bin/simple-acme.sh
             chmod +x /usr/local/bin/simple-acme.sh
             green "更新成功！"
         fi
