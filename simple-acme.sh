@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION="1.6.1"
+VERSION="1.6.2"
 
 RED="\033[31m"
 GREEN="\033[32m"
@@ -386,8 +386,8 @@ own_cert() {
 
     mkdir ~/${domain}
     cd ~/${domain}
-    openssl genrsa -out ${domain}.key 1024
-    openssl req -new -x509 -days ${days} -key ${domain}.key -out ${domain}.crt -subj "/C=${country}/ST=${state}/L=${city}/O=${company}/OU=${section}/CN=${domain}"
+    openssl ecparam -genkey -name prime256v1 -out ${domain}.key
+    openssl req -new -sha256  -days ${days} -key ${domain}.key -out ${domain}.crt -subj "/C=${country}/ST=${state}/L=${city}/O=${company}/OU=${section}/CN=${domain}"
     yellow "生成成功，证书位于 /root/${domain}/${domain}.crt "
     yellow "私钥位于: /root/${domain}/${domain}.key"
 }
